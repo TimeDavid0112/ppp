@@ -2,7 +2,7 @@
 import calendar
 from datetime import datetime
 from openpyxl import Workbook
-from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
+from openpyxl.styles import Font, Alignment, Border, Side, PatternFill, Color
 from openpyxl.utils import get_column_letter
 from openpyxl.formatting.rule import DataBarRule
 
@@ -15,25 +15,25 @@ def create_habit_tracker():
     
     habits_data = [
         ("🧘 Медитация", 10),
-        ("💧 Пить воду", 31),
+        (" Пить воду", 31),
         ("🚶 10 000 шагов", 31),
-        ("📖 Читать книгу", 10),
-        ("🥗 Полезное питание", 31),
+        (" Читать книгу", 10),
+        (" Полезное питание", 31),
         ("🏋️ Тренировка", 10),
         ("😴 Сон до 23:00", 31),
-        ("📓 Ведение дневника", 4),
+        (" Ведение дневника", 4),
         ("🧴 Уход за собой", 15),
         ("📵 Час без телефона", 31),
         ("📥 Проверить входящие заявки", 31),
-        ("📱 Проверить соцсети", 31),
+        (" Проверить соцсети", 31),
         ("📸 Выложить пост", 31),
         ("🎬 Снять/смонтировать сторис", 15),
         ("💬 Ответить клиентам", 31),
         ("📂 Разобрать рабочие чаты", 31),
         ("✅ Закрыть задачи в CRM", 31),
-        ("📊 Проверить рекламу / статистику", 2),
+        (" Проверить рекламу / статистику", 2),
         ("📄 Выставить счета / КП", 31),
-        ("🗂 Навести порядок в проектах", 1),
+        (" Навести порядок в проектах", 1),
     ]
     
     ws_data['A1'] = "Год"
@@ -90,16 +90,18 @@ def create_habit_tracker():
         
         # Сетка трекера
         week_headers = ["1 неделя", "2 неделя", "3 неделя", "4 неделя", "5 неделя"]
-        # ИСПРАВЛЕНО: убран символ #, оставлены чистые HEX-коды
+        # Чистые HEX-коды цветов (без #)
         week_colors = ["FFE4D6", "D6E4FF", "E0F0E0", "E8E0F0", "FFE0E8"]
         
-        for i, (header, color) in enumerate(zip(week_headers, week_colors)):
+        for i, (header, color_hex) in enumerate(zip(week_headers, week_colors)):
             start_col = 3 + i * 7
             end_col = start_col + 6
             ws.merge_cells(start_row=11, start_column=start_col, end_row=11, end_column=end_col)            cell = ws.cell(row=11, column=start_col)
             cell.value = header
             cell.alignment = Alignment(horizontal='center')
-            cell.fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
+            
+            # ИСПРАВЛЕНИЕ: Используем объект Color и fgColor для PatternFill
+            cell.fill = PatternFill(patternType='solid', fgColor=Color(color_hex))
         
         for day in range(1, 32):
             col = 2 + day
@@ -143,9 +145,9 @@ def create_habit_tracker():
             ws.cell(row=row_idx, column=44, value=f'=AJ{row_idx}&"/"&{goal}')
             ws.cell(row=row_idx, column=45, value=f'=AJ{row_idx}/{goal}')
             ws.cell(row=row_idx, column=45).number_format = '0%'
-        
-        for row in range(11, 25):
-            for col in range(1, 46):                cell = ws.cell(row=row, column=col)
+                for row in range(11, 25):
+            for col in range(1, 46):
+                cell = ws.cell(row=row, column=col)
                 cell.alignment = Alignment(horizontal='center', vertical='center')
                 if row in (11, 12, 13) or col in (1, 2) or col >= 42:
                     cell.border = Border(bottom=Side(style='thin'), top=Side(style='thin'))
